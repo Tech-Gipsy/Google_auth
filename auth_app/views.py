@@ -1,5 +1,8 @@
 # auth_app/views.py
-
+from allauth.account.views import login
+from allauth.socialaccount.models import SocialAccount
+from django.http import JsonResponse
+from django.shortcuts import redirect
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -44,3 +47,20 @@ class LoginView(APIView):
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+def google_sign_in(request):
+    user = request.user
+    if user.is_authenticated:
+        social_account = SocialAccount.objects.get(user=user, provider='google')
+        id_token = social_account.extra_data['id_token']
+        try:
+            # Verify the ID token with Firebase
+            decoded_token = auth.verify_id_token(id_token)
+            uid = decoded_token['uid']
+            # You can now create a session or further authenticate
+            login(request, user)
+            return redirect('/')
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+    else:
+        return redirect('/accounts/login/')
+
