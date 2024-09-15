@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+  </head>
+  <body>
+
+    <div class="brand right">
+            <h3>
+              {% if user.is_authenticated %}
+                <span style="line-height: 38px">Welcome {{user.username}}, <a href="{% url 'logout' %}?next={{request.path}}" style="color: red">Logout</a></span>
+              {% else %}
+                <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn btn-danger">Login/Signup with Google</a>
+              {% endif %}
+            </h3>
+          </div>
+          <a id="toggle-nav" class="right">
+            <span></span> <span></span> <span></span>
+          </a>
+  </body>
+</html>
